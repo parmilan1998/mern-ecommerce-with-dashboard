@@ -68,13 +68,60 @@ export const loginUser = asyncHandler(async (req, res) => {
 });
 
 // GET - http://localhost:8080/api/v1/user/logout
-export const logoutUser = asyncHandler(async (req, res) => {});
+export const logoutUser = asyncHandler(async (req, res) => {
+  res.status(200).json({ message: "Logout successful" });
+});
 
 // GET - http://localhost:8080/api/v1/user/profile
-export const getUserInfo = asyncHandler(async (req, res) => {});
+export const getUserInfo = asyncHandler(async (req, res) => {
+  const user = req.user;
+
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  res.status(200).json({
+    _id: user._id,
+    username: user.username,
+    email: user.email,
+    role: user.role,
+  });
+});
 
 // PUT - http://localhost:8080/api/v1/user/profile/id
-export const updateUserProfile = asyncHandler(async (req, res) => {});
+export const updateUserProfile = asyncHandler(async (req, res) => {
+  const { username, email, password } = req.body;
+  const user = await User.findById(req.user._id);
+
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  if (username) user.username = username;
+  if (email) user.email = email;
+  if (password) {
+    user.password = await bcrypt.hash(password, 10);
+  }
+
+  const updatedUser = await user.save();
+
+  res.status(200).json({
+    message: "User profile updated successfully",
+    _id: updatedUser._id,
+    username: updatedUser.username,
+    email: updatedUser.email,
+    role: updatedUser.role,
+  });
+});
 
 // DELETE - http://localhost:8080/api/v1/user/id
-export const deleteUser = asyncHandler(async (req, res) => {});
+export const deleteUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const user = await User.findByIdAndDelete(id);
+
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  res.status(200).json({ message: "User deleted successfully" });
+});
