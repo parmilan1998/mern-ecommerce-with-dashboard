@@ -3,15 +3,15 @@ import asyncHandler from "express-async-handler";
 
 // POST - http://localhost:8080/api/v1/category
 export const createCategory = asyncHandler(async (req, res) => {
-  const { title, description } = req.body;
+  const { categoryName, description } = req.body;
 
-  if (!title || !description) {
+  if (!categoryName || !description) {
     return res
       .status(400)
-      .json({ message: "Title and description are required" });
+      .json({ message: "categoryName and description are required" });
   }
 
-  const category = await Category.create({ title, description });
+  const category = await Category.create({ categoryName, description });
 
   res.status(201).json({ category: category });
 });
@@ -41,7 +41,7 @@ export const queryCategory = asyncHandler(async (req, res) => {
   // Search Filter
   const searchCategory = {
     $or: [
-      { title: { $regex: search, $options: "i" } },
+      { categoryName: { $regex: search, $options: "i" } },
       { description: { $regex: search, $options: "i" } },
     ],
   };
@@ -53,7 +53,7 @@ export const queryCategory = asyncHandler(async (req, res) => {
 
   // Fetch categories with search, sorting, and pagination
   const categories = await Category.find(searchCategory)
-    .sort({ title: sortCategory })
+    .sort({ categoryName: sortCategory })
     .skip(offset)
     .limit(parseInt(limit));
 
@@ -71,10 +71,10 @@ export const queryCategory = asyncHandler(async (req, res) => {
 // PUT - http://localhost:8080/api/v1/category/:id
 export const updateCategory = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { title, description } = req.body;
+  const { categoryName, description } = req.body;
   const category = await Category.findByIdAndUpdate(
     id,
-    { title, description },
+    { categoryName, description },
     { new: true }
   );
 

@@ -23,9 +23,13 @@ const productSchema = new Schema(
       required: true,
       default: 0,
     },
-    categories: {
+    category: {
       type: Schema.Types.ObjectId,
       ref: "Category",
+    },
+    categoryName: {
+      type: String,
+      required: true,
     },
   },
   {
